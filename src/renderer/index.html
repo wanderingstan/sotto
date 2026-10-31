@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+<title>Sotto</title>
+<link rel="stylesheet" href="../../node_modules/@xterm/xterm/css/xterm.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div id="status" role="status">Preparing speech model…</div>
+  <div id="agent" role="status"></div>
+  <button id="toggle" disabled>Start listening</button>
+</header>
+<div id="notice" class="banner" hidden>Sotto needs a headset. On speakers, your mic picks up the other side and the transcript gets muddled.</div>
+<div id="alert" class="banner" role="alert" hidden></div>
+<div class="panes">
+  <main>
+    <nav class="bar">
+      <div class="tabs" role="tablist">
+        <button id="tab-board" role="tab" class="tab">Board</button>
+        <button id="tab-site" role="tab" class="tab" hidden>Website</button>
+        <button id="tab-instructions" role="tab" class="tab">Instructions</button>
+      </div>
+      <div id="board-nav" class="pager">
+        <button id="page-prev" class="plain" aria-label="Previous board">‹</button>
+        <span id="page-label"></span>
+        <button id="page-next" class="plain" aria-label="Next board">›</button>
+        <button id="page-latest" class="plain" hidden>Latest</button>
+      </div>
+      <div id="site-nav" class="pager" hidden>
+        <span id="site-url"></span>
+        <button id="site-open" class="plain">Open in browser</button>
+        <button id="site-close" class="plain" aria-label="Close website">✕</button>
+      </div>
+      <div id="instructions-nav" class="pager" hidden>
+        <span id="instructions-state" role="status"></span>
+        <button id="instructions-open" class="plain">Open file</button>
+        <button id="instructions-reset" class="plain">Reset to default</button>
+      </div>
+    </nav>
+    <!-- allow-same-origin with no allow-scripts: this page can fill it, nothing in it can run. -->
+    <iframe id="board" title="Board" sandbox="allow-same-origin"></iframe>
+    <div id="site" hidden></div>
+    <textarea id="instructions" aria-label="Instructions for Claude" spellcheck="false" hidden></textarea>
+  </main>
+  <aside>
+    <div class="meters">
+      <div class="meter"><span>You</span><div><i id="mic"></i></div></div>
+      <div class="meter"><span>Them</span><div><i id="system"></i></div></div>
+    </div>
+    <div id="transcript" aria-live="polite"><div id="empty">The transcript appears here while you listen.</div></div>
+    <div id="terminal"></div>
+  </aside>
+</div>
+<script src="../../node_modules/@xterm/xterm/lib/xterm.js"></script>
+<script src="../../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
+<script src="capture.js"></script>
+<script src="board.js"></script>
+<script src="site.js"></script>
+<script src="instructions.js"></script>
+<script src="terminal.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

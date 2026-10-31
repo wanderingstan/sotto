@@ -1,0 +1,28 @@
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('sotto', {
+  startSession: (size) => ipcRenderer.invoke('session:start', size),
+  stopSession: () => ipcRenderer.invoke('session:stop'),
+  sendAudio: (stream, pcm, at) => ipcRenderer.send('audio', { stream, pcm, at }),
+  status: (line) => ipcRenderer.send('status', line),
+  onEngine: (fn) => ipcRenderer.on('engine', (_e, msg) => fn(msg)),
+  onTurn: (fn) => ipcRenderer.on('turn', (_e, turn) => fn(turn)),
+  onTurnRemoved: (fn) => ipcRenderer.on('turn-removed', (_e, msg) => fn(msg)),
+  termInput: (data) => ipcRenderer.send('term-input', data),
+  termResize: (size) => ipcRenderer.send('term-resize', size),
+  onTermData: (fn) => ipcRenderer.on('term-data', (_e, data) => fn(data)),
+  onAgent: (fn) => ipcRenderer.on('agent', (_e, msg) => fn(msg)),
+  onBoardSection: (fn) => ipcRenderer.on('board-section', (_e, msg) => fn(msg)),
+  onBoardNew: (fn) => ipcRenderer.on('board-new', (_e, msg) => fn(msg)),
+  getInstructions: () => ipcRenderer.invoke('instructions:get'),
+  setInstructions: (text) => ipcRenderer.invoke('instructions:set', text),
+  resetInstructions: () => ipcRenderer.invoke('instructions:reset'),
+  openInstructions: () => ipcRenderer.send('instructions:open'),
+  openLink: (url) => ipcRenderer.send('open-link', url),
+  siteLayout: (layout) => ipcRenderer.send('site-layout', layout),
+  siteClose: () => ipcRenderer.send('site-close'),
+  onSiteShown: (fn) => ipcRenderer.on('site-shown', (_e, msg) => fn(msg)),
+  onSiteUrl: (fn) => ipcRenderer.on('site-url', (_e, msg) => fn(msg)),
+  onSiteFailed: (fn) => ipcRenderer.on('site-failed', (_e, msg) => fn(msg)),
+  onBoardRemove: (fn) => ipcRenderer.on('board-remove', (_e, msg) => fn(msg)),
+});

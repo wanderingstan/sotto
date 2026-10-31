@@ -1,0 +1,23 @@
+{
+  "name": "sotto",
+  "productName": "Sotto",
+  "version": "0.0.1",
+  "private": true,
+  "description": "A silent companion for your calls: listens to mic and system audio, keeps a private board.",
+  "main": "src/main.js",
+  "scripts": {
+    "postinstall": "node node_modules/electron/install.js && node scripts/patch-dev-electron.js",
+    "start": "open -W node_modules/electron/dist/Electron.app --args \"$PWD\"",
+    "test": "node --test \"tests/*.test.mjs\""
+  },
+  "devDependencies": {
+    "electron": "45.2.1"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "node-pty": "^1.1.0",
+    "zod": "^4.6.7"
+  }
+}
