@@ -1,6 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('sotto', {
+  platform: process.platform,
   startSession: (size) => ipcRenderer.invoke('session:start', size),
   stopSession: () => ipcRenderer.invoke('session:stop'),
   sendAudio: (stream, pcm, at) => ipcRenderer.send('audio', { stream, pcm, at }),

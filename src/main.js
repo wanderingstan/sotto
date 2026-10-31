@@ -148,7 +148,8 @@ async function startAgent({ cols, rows }) {
 }
 
 ipcMain.handle('session:start', async (_e, size) => {
-  const microphone = await systemPreferences.askForMediaAccess('microphone');
+  // Only macOS has this prompt. Elsewhere getUserMedia reports a refusal on its own.
+  const microphone = process.platform === 'darwin' ? await systemPreferences.askForMediaAccess('microphone') : true;
   log(`[session] start, microphone=${microphone}`);
   if (agent) agent.kill();
   transcriber.start();
@@ -194,7 +195,7 @@ app.on('second-instance', () => {
 
 app.whenReady().then(() => {
   instructions = new Instructions(path.join(app.getPath('userData'), 'instructions.md'));
-  log(`--- start: Electron ${process.versions.electron}, macOS ${process.getSystemVersion()}, packaged=${app.isPackaged}`);
+  log(`--- start: Electron ${process.versions.electron}, ${process.platform} ${process.getSystemVersion()}, packaged=${app.isPackaged}`);
 
   // Chromium insists on a video source even though we only keep the audio. Our own
   // frame satisfies it without listing screens, so we never need the Screen Recording

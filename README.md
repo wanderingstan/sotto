@@ -6,7 +6,7 @@ A silent companion for your calls. Sotto listens to your microphone and your com
 
 Sotto is a spinoff of [Vibeconferencing](https://github.com/wanderingstan/vibeconf-app), which brings AI agents into video calls as participants who can hear, speak and share their screen. Sotto keeps the listening and the Claude loop, reusing its on-device transcription and agent techniques, but drops the bot: nobody else on the call knows it's there.
 
-> **Status: proof of concept.** It has been tested on one Mac, on Google Meet calls with a headset. It runs from source and isn't packaged yet.
+> **Status: proof of concept.** It has been tested on one Apple silicon Mac, on Google Meet calls with a headset. The Intel Mac and Windows packages haven't been run yet.
 
 ## What it does
 
@@ -14,11 +14,15 @@ Sotto is a spinoff of [Vibeconferencing](https://github.com/wanderingstan/vibeco
 - **Keeps a board:** Claude adds notes, defines terms, links companies and products, and draws diagrams as people describe things. New content is highlighted, and you can flip back through earlier boards.
 - **Shows pictures and websites:** images appear on the board, and web pages open in a tab beside it. Links open in your own browser.
 - **Answers you privately:** type to Claude in the terminal pane during the call.
-- **Takes your instructions:** edit what Claude does in the Instructions tab, or in the file at `~/Library/Application Support/Sotto/instructions.md`.
+- **Takes your instructions:** edit what Claude does in the Instructions tab, or in the `instructions.md` file (on a Mac, at `~/Library/Application Support/Sotto/`).
 
 ## Running it
 
-You need macOS 14.2 or later, Node.js, a headset, and [Claude Code](https://code.claude.com/docs/en/quickstart) installed and signed in.
+You need a headset and [Claude Code](https://code.claude.com/docs/en/quickstart) installed and signed in. On a Mac, you also need macOS 14.2 or later.
+
+Download Sotto for Mac or Windows from the [releases page](https://github.com/wanderingstan/sotto/releases). The Windows installer isn't signed, so SmartScreen will warn you: choose "More info", then "Run anyway". On Windows, Claude Code has to come from its native installer rather than npm.
+
+To run from source instead, you also need Node.js:
 
 ```bash
 git clone https://github.com/wanderingstan/sotto.git
@@ -27,7 +31,7 @@ npm install
 npm start
 ```
 
-Press **Start listening**. macOS asks for microphone and system audio access the first time; Screen Recording isn't needed. The speech model (about 18 MB) downloads on first launch.
+Press **Start listening**. On a Mac, you'll be asked for microphone and system audio access the first time; Screen Recording isn't needed. The speech model (about 18 MB) downloads on first launch.
 
 A headset is required. On speakers, your mic picks up the other side and the transcript gets muddled.
 

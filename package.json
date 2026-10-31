@@ -9,10 +9,15 @@
   "scripts": {
     "postinstall": "node node_modules/electron/install.js && node scripts/patch-dev-electron.js",
     "start": "open -W node_modules/electron/dist/Electron.app --args \"$PWD\"",
-    "test": "node --test \"tests/*.test.mjs\""
+    "test": "node --test \"tests/*.test.mjs\"",
+    "start:win": "electron .",
+    "dist:mac": "electron-builder --mac",
+    "dist:mac:fast": "electron-builder --mac --arm64 -c.mac.notarize=false",
+    "dist:win": "electron-builder --win --x64"
   },
   "devDependencies": {
-    "electron": "45.2.1"
+    "electron": "45.2.1",
+    "electron-builder": "^26.18.0"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
@@ -20,5 +25,67 @@
     "@xterm/xterm": "^6.0.0",
     "node-pty": "^1.1.0",
     "zod": "^4.6.7"
+  },
+  "author": "Stan James <stan@wanderingstan.com>",
+  "homepage": "https://github.com/wanderingstan/sotto",
+  "build": {
+    "appId": "com.wanderingstan.sotto",
+    "productName": "Sotto",
+    "publish": null,
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**",
+      "package.json",
+      "!**/*.pdb"
+    ],
+    "asarUnpack": [
+      "node_modules/node-pty/**"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "files": [
+        "!**/node-pty/prebuilds/win32-*/**",
+        "!**/node-pty/third_party/**"
+      ],
+      "extendInfo": {
+        "NSAudioCaptureUsageDescription": "Sotto listens to the other side of your call to take notes for you.",
+        "NSMicrophoneUsageDescription": "Sotto listens to your side of the call to take notes for you."
+      }
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "files": [
+        "!**/node-pty/prebuilds/darwin-*/**"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    }
   }
 }

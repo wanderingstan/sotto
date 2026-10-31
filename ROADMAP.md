@@ -22,5 +22,5 @@ Let the user pick Claude's model in the app. It uses Opus for now.
 - **Test Zoom and Teams:** a real Google Meet call in the browser has worked with a headset. Desktop Zoom and Teams haven't been tried.
 - **Keep nothing on disk:** interactive Claude Code writes the call's words to its session log under `~/.claude/projects`. Delete or avoid that log before claiming nothing is kept.
 - **Tighten what can leave the machine:** images and websites load addresses Claude chooses, so a hostile caller could try to get call details into one. A stricter mode would load them only when clicked.
-- **Remove the startup delay:** Claude's first turn runs before its tools connect, so it takes about 30 seconds to start following the call.
-- **Package the app:** it only runs from source, on macOS.
+- **Test the other packages:** run the Intel Mac and Windows builds, and sign the Windows installer so SmartScreen doesn't warn people.
+- **Give it an icon:** it still has Electron's default.

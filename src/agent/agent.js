@@ -62,12 +62,21 @@ function agentEnv(env) {
 
 // A GUI-launched app gets a minimal PATH, so check where installers put it first.
 function findClaude() {
-  const known = [path.join(os.homedir(), '.local/bin/claude'), '/opt/homebrew/bin/claude', '/usr/local/bin/claude'];
+  const home = os.homedir();
+  const windows = process.platform === 'win32';
+  const known = windows
+    ? [path.join(home, '.local', 'bin', 'claude.exe')]
+    : [path.join(home, '.local/bin/claude'), '/opt/homebrew/bin/claude', '/usr/local/bin/claude'];
   const hit = known.find((p) => fs.existsSync(p));
   if (hit) return Promise.resolve(hit);
   return new Promise((resolve) => {
-    execFile(process.env.SHELL || '/bin/zsh', ['-lc', 'command -v claude'], (err, stdout) => {
-      resolve(err ? null : stdout.trim() || null);
+    const [cmd, args] = windows
+      ? ['where.exe', ['claude']]
+      : [process.env.SHELL || '/bin/zsh', ['-lc', 'command -v claude']];
+    execFile(cmd, args, (err, stdout) => {
+      const found = err ? [] : stdout.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+      // A Windows npm install gives a .cmd shim, which can't be run directly.
+      resolve((windows ? found.find((l) => /\.exe$/i.test(l)) : found[0]) || null);
     });
   });
 }
@@ -83,6 +92,7 @@ class Agent extends EventEmitter {
     this._rows = rows;
     this._log = log;
     this._pty = null;
+    this._killed = false;
   }
 
   async start() {
@@ -122,6 +132,8 @@ class Agent extends EventEmitter {
     this._pty.onExit(({ exitCode, signal }) => {
       this._pty = null;
       this._log(`[agent] exit code=${exitCode} signal=${signal}`);
+      // Ended by us for a new session, which is already reporting its own state.
+      if (this._killed) { this.emit('exit'); return; }
       this.emit('state', exitCode && !signal
         ? { state: 'failed', detail: 'Claude stopped unexpectedly. Its last output is in the terminal.' }
         : { state: 'off' });
@@ -145,7 +157,10 @@ class Agent extends EventEmitter {
     if (this._pty) this._pty.resize(cols, rows);
   }
 
-  kill() { if (this._pty) this._pty.kill(); }
+  kill() {
+    this._killed = true;
+    if (this._pty) this._pty.kill();
+  }
 }
 
 module.exports = { Agent, buildArgs, agentEnv, findClaude };

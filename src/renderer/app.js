@@ -5,9 +5,12 @@ const els = {
   transcript: $('transcript'), empty: $('empty'), mic: $('mic'), system: $('system'), agent: $('agent'),
 };
 
-const PROBLEMS = {
+const PROBLEMS = window.sotto.platform === 'darwin' ? {
   mic: 'Sotto can’t hear your microphone. Allow it in System Settings → Privacy & Security → Microphone.',
   system: 'Sotto can’t hear the call. Allow it in System Settings → Privacy & Security → Screen & System Audio Recording, under System Audio Recording Only, then start again.',
+} : {
+  mic: 'Sotto can’t hear your microphone. Check that one is connected and allowed in your system’s privacy settings.',
+  system: 'Sotto can’t hear the call’s audio.',
 };
 
 let running = false;
