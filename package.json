@@ -2,6 +2,7 @@
   "name": "sotto",
   "productName": "Sotto",
   "version": "0.0.1",
+  "license": "MIT",
   "private": true,
   "description": "A silent companion for your calls: listens to mic and system audio, keeps a private board.",
   "main": "src/main.js",
