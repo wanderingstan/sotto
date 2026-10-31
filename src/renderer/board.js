@@ -4,15 +4,15 @@
 window.board = (() => {
   const $ = (id) => document.getElementById(id);
   const frame = $('board');
-  const EMPTY = 'Claude’s notes appear here while you listen.';
+  const EMPTY = 'Sotto’s notes appear here while you listen.';
   const NEW_MS = 12000;
   const BLOCKS = 'li, p, dt, dd, tr, svg, img';
 
   frame.srcdoc = `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:">
 <style>
-:root { --fg: #1a1a1a; --muted: #6b6b6b; --line: #e4e4e4; --bg: #ffffff; --link: #1f6feb; --new: #fff0b3; }
-@media (prefers-color-scheme: dark) { :root { --fg: #ececec; --muted: #9a9a9a; --line: #333333; --bg: #1b1b1b; --link: #6ea8ff; --new: #57480f; } }
+:root { --fg: #1a1a1a; --muted: #6b6b6b; --line: #e4e4e4; --bg: #ffffff; --link: #1f6feb; --new: #ececec; }
+@media (prefers-color-scheme: dark) { :root { --fg: #ececec; --muted: #9a9a9a; --line: #333333; --bg: #1b1b1b; --link: #6ea8ff; --new: #2a2a2a; } }
 html { background: var(--bg); color: var(--fg); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 body { margin: 0; padding: 16px 24px 32px; }
 #empty { color: var(--muted); }

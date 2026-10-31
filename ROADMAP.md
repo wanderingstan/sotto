@@ -13,6 +13,10 @@ Borrow from Vibeconferencing to build a Chrome extension that grabs the live cap
 
 Only calls running in the browser would be covered, so on-device transcription stays for desktop calling apps and for platforms without captions.
 
+### Choosing the model
+
+Let the user pick Claude's model in the app. It uses Opus for now.
+
 ## Before relying on it
 
 - **Test Zoom and Teams:** a real Google Meet call in the browser has worked with a headset. Desktop Zoom and Teams haven't been tried.

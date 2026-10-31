@@ -67,4 +67,7 @@ server.tool(
   async ({ title }) => { await call('/new-board', { title }); return text('New board started.'); },
 );
 
+// Tell the app once Claude Code has finished connecting, so it can start the agent off.
+server.server.oninitialized = () => { call('/hello').catch(() => {}); };
+
 server.connect(new StdioServerTransport());

@@ -3,7 +3,7 @@
 // phantom "Thank you." from the speech engine. Words said while the agent is busy
 // wait here and arrive together on its next call. Pure: no electron requires.
 class TurnFeed {
-  constructor({ wordsToWake = 40, minWords = 8, quietMs = 6000, pollMs = 250, now = Date.now } = {}) {
+  constructor({ wordsToWake = 40, minWords = 8, quietMs = 2000, pollMs = 250, now = Date.now } = {}) {
     this._wordsToWake = wordsToWake;
     this._minWords = minWords;
     this._quietMs = quietMs;

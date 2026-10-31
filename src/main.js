@@ -25,6 +25,8 @@ const SPEAKERS = { mic: 'You', system: 'Them' };
 // How long a quiet call can block next_transcript before the agent gets an empty answer.
 // Under Claude Code's 120 s limit, past which it moves a tool call to the background.
 const MAX_QUIET_MS = 100 * 1000;
+// From its MCP server connecting to its tools being listed and its prompt being ready.
+const BEGIN_DELAY_MS = 1500;
 // Let Claude Code queue the message before the blocked tool returns, or it misses it.
 const WAKE_DELAY_MS = 200;
 
@@ -75,9 +77,7 @@ function nudgeIfIdle() {
   if (!agent || !shouldNudge({ now, waiting, ended, lastCallAt, lastKeyAt })) return;
   log('[agent] nudged back into its loop');
   lastCallAt = now;
-  agent.write(NUDGE_TEXT);
-  // Sent apart, or the TUI reads the Enter as part of pasted text.
-  setTimeout(() => { if (agent) agent.write('\r'); }, 300);
+  agent.say(NUDGE_TEXT);
 }
 
 function sendAgent(state, detail) {
@@ -96,6 +96,11 @@ async function startAgent({ cols, rows }) {
   clearInterval(nudgeTimer);
   nudgeTimer = setInterval(nudgeIfIdle, 5000);
   api = await startLocalApi({
+    '/hello': async () => {
+      lastCallAt = Date.now();
+      setTimeout(() => { if (agent) agent.begin(); }, BEGIN_DELAY_MS);
+      return {};
+    },
     '/next': async (_body, res) => {
       sendAgent('watching');
       waiting = true;

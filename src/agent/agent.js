@@ -22,13 +22,15 @@ const PARENT_SESSION_VARS = [
   'CLAUDE_EFFORT',
 ];
 
+// Sent once its tools have connected. Started with this as a prompt, its first turn ran
+// before they had, and it stopped to say so.
+const BEGIN_TEXT = 'The call has started. Begin.';
+
 const MCP_TOOLS = ['next_transcript', 'set_section', 'remove_section', 'fetch_image', 'show_website', 'new_board'].map((t) => `mcp__Sotto__${t}`);
 const BUILT_IN_TOOLS = ['WebSearch'];
 
-function buildArgs({ prompt, mcpConfigPath, model = 'sonnet' }) {
+function buildArgs({ prompt, mcpConfigPath, model = 'opus' }) {
   return [
-    // First, because --tools and --mcp-config would swallow a trailing positional.
-    'The call has started. Begin.',
     '--system-prompt', prompt,
     '--model', model,
     '--mcp-config', mcpConfigPath,
@@ -37,6 +39,7 @@ function buildArgs({ prompt, mcpConfigPath, model = 'sonnet' }) {
     '--allowedTools', [...BUILT_IN_TOOLS, ...MCP_TOOLS].join(','),
     '--permission-mode', 'dontAsk',
     '--setting-sources', '',
+    '--settings', JSON.stringify({ spinnerTipsEnabled: false }),
     '--disable-slash-commands',
   ];
 }
@@ -50,6 +53,8 @@ function agentEnv(env) {
   // next_transcript blocks for as long as the call is quiet.
   out.MCP_TOOL_TIMEOUT = String(60 * 60 * 1000);
   out.TERM = 'xterm-256color';
+  // No promos, tips or update checks in a pane someone is glancing at mid-call.
+  out.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = '1';
   // Its suggested next prompt looks like something the user typed.
   out.CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION = 'false';
   return out;
@@ -125,6 +130,14 @@ class Agent extends EventEmitter {
   }
 
   write(data) { if (this._pty) this._pty.write(data); }
+
+  /** Type a message and send it. Apart, or the TUI reads the Enter as part of pasted text. */
+  say(text) {
+    this.write(text);
+    setTimeout(() => this.write('\r'), 300);
+  }
+
+  begin() { this.say(BEGIN_TEXT); }
 
   resize(cols, rows) {
     this._cols = cols;
