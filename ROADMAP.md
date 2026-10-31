@@ -15,7 +15,7 @@ Only calls running in the browser would be covered, so on-device transcription s
 
 ## Before relying on it
 
-- **Test a real call:** run a Zoom or Teams call with a headset.
+- **Test Zoom and Teams:** a real Google Meet call in the browser has worked with a headset. Desktop Zoom and Teams haven't been tried.
 - **Keep nothing on disk:** interactive Claude Code writes the call's words to its session log under `~/.claude/projects`. Delete or avoid that log before claiming nothing is kept.
 - **Tighten what can leave the machine:** images and websites load addresses Claude chooses, so a hostile caller could try to get call details into one. A stricter mode would load them only when clicked.
 - **Remove the startup delay:** Claude's first turn runs before its tools connect, so it takes about 30 seconds to start following the call.

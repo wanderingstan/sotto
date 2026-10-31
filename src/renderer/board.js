@@ -5,12 +5,14 @@ window.board = (() => {
   const $ = (id) => document.getElementById(id);
   const frame = $('board');
   const EMPTY = 'Claude’s notes appear here while you listen.';
+  const NEW_MS = 12000;
+  const BLOCKS = 'li, p, dt, dd, tr, svg, img';
 
   frame.srcdoc = `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:">
 <style>
-:root { --fg: #1a1a1a; --muted: #6b6b6b; --line: #e4e4e4; --bg: #ffffff; --link: #1f6feb; }
-@media (prefers-color-scheme: dark) { :root { --fg: #ececec; --muted: #9a9a9a; --line: #333333; --bg: #1b1b1b; --link: #6ea8ff; } }
+:root { --fg: #1a1a1a; --muted: #6b6b6b; --line: #e4e4e4; --bg: #ffffff; --link: #1f6feb; --new: #fff0b3; }
+@media (prefers-color-scheme: dark) { :root { --fg: #ececec; --muted: #9a9a9a; --line: #333333; --bg: #1b1b1b; --link: #6ea8ff; --new: #57480f; } }
 html { background: var(--bg); color: var(--fg); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 body { margin: 0; padding: 16px 24px 32px; }
 #empty { color: var(--muted); }
@@ -28,6 +30,8 @@ svg { display: block; max-width: 100%; height: auto; }
 img { display: block; max-width: min(100%, 320px); max-height: 200px; height: auto; margin: 4px 0; border-radius: 4px; }
 a { color: var(--link); text-decoration: none; cursor: pointer; }
 a:hover { text-decoration: underline; }
+.new { animation: new ${NEW_MS}ms ease-in; border-radius: 3px; }
+@keyframes new { from, 50% { background-color: var(--new); } to { background-color: transparent; } }
 </style></head><body></body></html>`;
 
   const loaded = new Promise((resolve) => {
@@ -57,6 +61,39 @@ a:hover { text-decoration: underline; }
     section.lastElementChild.innerHTML = html;
     // The address shows on hover, so a link can't hide where it goes.
     section.querySelectorAll('a[href]').forEach((a) => { a.title = a.href; });
+  }
+
+  // What a block says, so a rewritten section can be compared with the one it replaces.
+  function blockKey(el) {
+    if (el.matches('svg')) return el.outerHTML;
+    if (el.matches('img')) return el.getAttribute('src');
+    return el.textContent.replace(/\s+/g, ' ').trim();
+  }
+
+  const blockKeys = (section) => new Set([...section.querySelectorAll(BLOCKS)].map(blockKey));
+
+  // When each block first appeared, per section, so a second update in quick succession
+  // doesn't wipe the highlight from the first or restart its fade.
+  let firstSeen = new Map();
+
+  // Claude rewrites whole sections, so this works out what actually changed, marks it,
+  // and brings the first of it into view.
+  function markNew(name, section, before) {
+    const now = Date.now();
+    const seen = firstSeen.get(name) || new Map();
+    let first = null;
+    for (const el of section.querySelectorAll(BLOCKS)) {
+      const key = blockKey(el);
+      if (!key) continue;
+      if (!before.has(key) && !seen.has(key)) seen.set(key, now);
+      const age = now - (seen.get(key) ?? -Infinity);
+      if (age >= NEW_MS) continue;
+      el.classList.add('new');
+      el.style.animationDelay = `${-age}ms`;
+      if (age === 0 && !first) first = el;
+    }
+    firstSeen.set(name, seen);
+    if (first) first.scrollIntoView({ block: 'nearest' });
   }
 
   function makeSection(name, html) {
@@ -103,10 +140,15 @@ a:hover { text-decoration: underline; }
     pages[latest()].sections.set(name, html);
     if (viewing !== latest()) return;
     const existing = [...doc().querySelectorAll('section')].find((s) => s.dataset.name === name);
-    if (existing) fill(existing, html);
-    else {
+    if (existing) {
+      const before = blockKeys(existing);
+      fill(existing, html);
+      markNew(name, existing, before);
+    } else {
       doc().getElementById('empty')?.remove();
-      doc().body.append(makeSection(name, html));
+      const section = makeSection(name, html);
+      doc().body.append(section);
+      markNew(name, section, new Set());
     }
   }
 
@@ -122,6 +164,7 @@ a:hover { text-decoration: underline; }
     const follow = viewing === latest();
     if (pages[latest()].sections.size) pages.push({ title, sections: new Map() });
     else pages[latest()].title = title;
+    firstSeen = new Map();
     if (follow) go(latest());
     else renderNav();
   }
@@ -129,6 +172,7 @@ a:hover { text-decoration: underline; }
   async function clear() {
     await loaded;
     fresh();
+    firstSeen = new Map();
     renderPage();
   }
 
